@@ -1,13 +1,13 @@
-# OpenCode CPA 图片输入排障手册
+# OpenCode CPA 图片输入排障手册 / Runbook
 
-## 覆盖的症状
+## 覆盖的症状 / Symptoms covered
 
 - OpenCode 提示 `does not support image input`
-- OpenCode 提示 `Unable to connect`
+- OpenCode says `Unable to connect`
 - 自定义 OpenAI 兼容 provider 返回 `Missing API key` 或 `Invalid API key`
 - `/v1/models` 正常，但 OpenCode 仍把 Codex 模型当成纯文本模型
 
-## 验证服务端
+## 验证服务端 / Verify the server
 
 1. 确认接口返回 `200`：
 
@@ -20,7 +20,10 @@ curl http://HOST:18081/v1/models -H "Authorization: Bearer test-api-key-123"
 - `supportedInputModalities` 包含 `TEXT` 和 `IMAGE`
 - 或客户端配置里已经写了 `modalities.input: ["text", "image"]`
 
-## 验证 OpenCode 配置
+1. Confirm the endpoint responds with `200`.
+2. Check that a model entry includes image support.
+
+## 验证 OpenCode 配置 / Verify OpenCode config
 
 - `provider_id/model_id` 要和 `opencode.jsonc` 里的 provider 与模型 key 对上
 - `baseURL` 要以 `/v1` 结尾
@@ -35,7 +38,7 @@ curl http://HOST:18081/v1/models -H "Authorization: Bearer test-api-key-123"
 }
 ```
 
-## 刷新模型缓存
+## 刷新模型缓存 / Refresh cached models
 
 使用 OpenCode CLI：
 
@@ -49,7 +52,13 @@ opencode models <provider_id> --refresh
 2. 重新创建
 3. 重启 OpenCode
 
-## 最小可用示例
+If the UI still shows stale capabilities:
+
+1. Delete the provider.
+2. Recreate it.
+3. Restart OpenCode.
+
+## 最小可用示例 / Minimal known-good example
 
 ```jsonc
 {
