@@ -37,6 +37,21 @@ When the user reports `does not support image input`, `Unable to connect`, or mi
 5. 如果客户端仍然拦图片，再在自定义 provider 里显式声明图片输入能力。
 5. If the client still blocks images, explicitly declare image input in the custom provider.
 
+## 快速判断 / Fast decision tree
+
+先判断是服务端问题还是客户端缓存问题。
+
+First decide whether this is a server-side metadata problem or a client-side cache problem.
+
+1. `curl` 直接打 `/v1/models`。
+1. Test `/v1/models` directly with `curl`.
+2. 如果返回里没有 `supportedInputModalities` 或图片能力，先修服务端。
+2. If the response lacks `supportedInputModalities` or image support, fix the server first.
+3. 如果返回里已经有图片能力，但 OpenCode 仍报错，刷新模型缓存或重建 provider。
+3. If the server already advertises image support but OpenCode still fails, refresh the model cache or recreate the provider.
+4. 如果 OpenCode 仍然把模型视为纯文本，显式补 `attachment: true` 和 `modalities.input`.
+4. If OpenCode still treats the model as text-only, explicitly add `attachment: true` and `modalities.input`.
+
 ## 客户端配置规则 / Client-side config rules
 
 在 OpenCode 里配置自定义 OpenAI 兼容 provider 时：
@@ -52,6 +67,25 @@ When configuring a custom OpenAI-compatible provider in OpenCode:
 - 如果模型支持图片但 OpenCode 没有自动识别，就显式设置 `attachment: true` 和 `modalities.input: ["text", "image"]`。
 - If a model supports images but OpenCode does not infer that automatically, set `attachment: true` and `modalities.input: ["text", "image"]` explicitly.
 
+## 常用验证命令 / Common verification commands
+
+```bash
+curl -sS http://HOST:18081/v1/models -H "Authorization: Bearer YOUR_KEY"
+```
+
+```bash
+opencode models <provider_id> --refresh
+```
+
+```bash
+opencode models <provider_id> --verbose
+```
+
+When debugging on the server side, confirm these two facts:
+
+- The request reaches the same port you configured in OpenCode.
+- The API key in OpenCode exactly matches one of the server's allowed keys.
+
 ## 恢复路径 / Recovery path
 
 如果 provider 看起来没问题，但 OpenCode 还是说模型不能读图：
@@ -66,6 +100,14 @@ If the provider looks correct but OpenCode still says the model cannot read imag
 3. Refresh the model cache.
 4. 如果能力仍然旧，重启 OpenCode。
 4. Restart OpenCode if it still shows stale capabilities.
+
+## 不要误判 / Common mistakes
+
+- `http` / `https` 写错。
+- `baseURL` 少了 `/v1`。
+- API key 填到了错误的字段。
+- 用了旧的 provider 名称，但 OpenCode 缓存里还保留着新 provider 的旧能力。
+- 只改了服务端源码，没有重启真正运行的二进制。
 
 ## 参考 / Reference
 
