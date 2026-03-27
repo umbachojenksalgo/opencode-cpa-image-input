@@ -1,6 +1,6 @@
 ---
 name: opencode-cpa-image-input
-description: Use when OpenCode or another OpenAI-compatible client on CLIProxyAPI/CPA shows image-input failures, connection errors, invalid API keys, or stale Codex model metadata. 适用于 OpenCode 或其他 OpenAI 兼容客户端在 CLIProxyAPI/CPA 上出现图片输入失败、连接失败、API key 错误或 Codex 模型元数据过旧的场景。
+description: Use when OpenCode on CLIProxyAPI/CPA has image-input failures, connection errors, invalid API keys, or stale model metadata. 用于排查 OpenCode 在 CLIProxyAPI/CPA 上的图片输入、连接、API key 和模型缓存问题。
 ---
 
 # OpenCode CPA 图片输入排障 / Image Input Troubleshooting
